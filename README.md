@@ -1,7 +1,7 @@
 # NavMeshSurface2DBaker
 About
 ---
-NavMeshSurface2DBaker is a Unity Package that provides functionality to bake 2D colliders into NavMesh components.
+NavMeshSurface2DBaker is a Unity Package that provides functionality to bake 2D colliders into NavMeshSurfaces, which are part of the [Unity NavMeshComponents](https://github.com/Unity-Technologies/NavMeshComponents) .
 
 Usage
 ---
@@ -28,3 +28,7 @@ Compatibility
 Current version tested with:
 * Unity 2018.3.0f2
 * Unity NavMeshComponents 2018.3.0f2
+
+3rd party components provided with project
+---
+* [Unity NavMeshComponents](https://github.com/Unity-Technologies/NavMeshComponents) (MIT license, for full license details see subfolder *NavMeshComponents*
