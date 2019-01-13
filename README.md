@@ -1,14 +1,17 @@
 # NavMeshSurface2DBaker
 About
 ---
-NavMeshSurface2DBaker is a Unity Package that provides functionality to bake 2D colliders into NavMeshSurfaces, which are part of the [Unity NavMeshComponents](https://github.com/Unity-Technologies/NavMeshComponents) .
+NavMeshSurface2DBaker is a Unity Package that provides functionality to bake 2D colliders into NavMeshSurfaces, which are part of the [Unity NavMeshComponents](https://github.com/Unity-Technologies/NavMeshComponents).
+
+![](https://raw.githubusercontent.com/SharlatanY/NavMeshSurface2DBaker/master/docs/img/tilemap_navmesh.png)
 
 Usage
 ---
 1. Put Surface2DBaker script on same GameObject as your NavMeshSurface.
-2. Add all components that contain 2D colliders you want to bake to "Objects Containing Obstacles". It is enough to add the root object, the script will automatically also search for colliders in children
-3. Set the NavMesh agent selected in your NavMesh surface to an appropriate size and check if all the baking settings on the Surface2DBaker component are as you want them. Check the tooltip if it's not clear what a setting does.
-4. Press the "Bake 2D" button. Your NavMesh will now be generated
+2. Make sure RenderMesh used for NavMeshBaking has a z-position value between 0 and -1.
+3. Add all components that contain 2D colliders you want to bake to "Objects Containing Obstacles". It is enough to add the root object, the script will automatically also search for colliders in children
+4. Set the NavMesh agent selected in your NavMesh surface to an appropriate size and check if all the baking settings on the Surface2DBaker component are as you want them. Check the tooltip if it's not clear what a setting does.
+5. Press the "Bake 2D" button. Your NavMesh will now be generated
 
 FAQ
 ---
