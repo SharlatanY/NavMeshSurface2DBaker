@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEditor.AI;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace NavMeshSurface2DBaker
 {
@@ -14,7 +11,7 @@ namespace NavMeshSurface2DBaker
   {
     [Tooltip("Add all objects that shall be searched for 2D colliders when baking.\n" +
              "Baker will automatically also search in children of added objects.")]
-    public List<GameObject> ObjectsContainingObstacles;
+    public List<GameObject> ObjectsContainingObstacles = new List<GameObject>();
 
     [Tooltip("Bake BoxCollider2D objects?\n" +
              "ATTENTION: Even if selected, won't bake a box collider if \"Used By Composite\" is true.")]
@@ -42,57 +39,14 @@ namespace NavMeshSurface2DBaker
     void Start()
     {
       //script shouldn't ever be enabled during runtime
-      this.gameObject.SetActive(false);
-    }
-
-    /// <summary>
-    /// Bakes the NavMesh, including 2D Colliders
-    /// </summary>
-    public void Bake()
-    {
-      _objectsToBeDeletedAfterBaking = CreateMeshes();
-      //adding navmesh modifier to ensure the area on top of the generated meshes doesn't count as walkable
-      foreach (var obj in _objectsToBeDeletedAfterBaking)
-      {
-        NavigationHelper.SetNonWalkable(obj);
-      }
-      BakeSurface();
-
-      //subscribe for editor update so we can later on delete the generated meshes.
-      //for details as to why we can't do this directly, see comments in method
-      //BakeSurface().
-      EditorApplication.update += OnEditorUpdate;
-    }
-
-    private void OnEditorUpdate()
-    {
-      var surface = GetComponent<NavMeshSurface>();
-      if (!NavMeshAssetManager.instance.IsSurfaceBaking(surface))
-      {
-        foreach (var obj in _objectsToBeDeletedAfterBaking)
-        {
-          DestroyImmediate(obj);
-        }
-        _objectsToBeDeletedAfterBaking.Clear();
-
-        if (DisableMeshRendererAfterBaking)
-        {
-          var meshRenderer = GetComponent<MeshRenderer>();
-          meshRenderer.enabled = false;
-        }
-
-        //This method is only added as subscriber to EditorApplication.update so we can clean up generated meshes when baking has finished.
-        //Now that baking has finished, unsubscribe.
-        // ReSharper disable once DelegateSubtraction
-        EditorApplication.update -= OnEditorUpdate;
-      }
+      this.enabled = false;
     }
 
     /// <summary>
     /// Collects all 2D colliders that shall be considered when baking and creates corresponding 3D colliders.
     /// </summary>
     /// <returns></returns>
-    private List<GameObject> CreateMeshes()
+    public List<GameObject> CreateMeshes()
     {
       if (ObjectsContainingObstacles == null)
       {
@@ -100,6 +54,12 @@ namespace NavMeshSurface2DBaker
       }
 
       var createdGameObjects = new List<GameObject>();
+      if (ObjectsContainingObstacles.Count == 0)
+      {
+        Debug.LogWarning($"No elements to search for 2D colliders set in field {nameof(ObjectsContainingObstacles)}. No 2D colliders will be baked.");
+        return createdGameObjects;
+      }
+      
       foreach (var obj in ObjectsContainingObstacles)
       {
         if (obj == null)
@@ -119,32 +79,6 @@ namespace NavMeshSurface2DBaker
       }
 
       return createdGameObjects;
-    }
-
-    /// <summary>
-    /// Calls the baking function of the <see cref="NavMeshSurface"/> located on the same game object as this script.
-    /// </summary>
-    private void BakeSurface()
-    {
-      if (EnableMeshRendererBeforeBaking)
-      {
-        var meshRenderer = GetComponent<MeshRenderer>();
-        meshRenderer.enabled = true;
-      }
-
-      var surface = GetComponent<NavMeshSurface>();
-      var targets = new UnityEngine.Object[] { surface };
-      NavMeshAssetManager.instance.StartBakingSurfaces(targets);
-
-      //while (NavMeshAssetManager.instance.IsSurfaceBaking(surface))
-      //{
-      //  absolutely DON'T wait for surface baking to be finished here for the purpose of
-      //  deleting the meshes.
-      //  Editor works in a way which leads to circumstances, where
-      //  IsSurfaceBaking will ALWAYS return "true" while we're still in the method call stack
-      //  started by pressing on the "Bake 2D button" in the GUI.
-      //  Cleanup takes place in callback to OnEditorUpdate.
-      //}
     }
 
     /// <summary>
