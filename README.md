@@ -11,7 +11,7 @@ Usage
 2. Make sure RenderMesh used for NavMeshBaking has a z-position value between 0 and -1.
 3. Add all components that contain 2D colliders you want to bake to "Objects Containing Obstacles". It is enough to add the root object, the script will automatically also search for colliders in children
 4. Set the NavMesh agent selected in your NavMesh surface to an appropriate size and check if all the baking settings on the Surface2DBaker component are as you want them. Check the tooltip if it's not clear what a setting does.
-5. Press the "Bake 2D" button. Your NavMesh will now be generated
+5. Press the "Bake 2D" button. Your NavMesh will now be generated.
 
 FAQ
 ---
