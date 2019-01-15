@@ -5,6 +5,10 @@ NavMeshSurface2DBaker is a Unity Package that provides functionality to bake 2D 
 
 ![](https://raw.githubusercontent.com/SharlatanY/NavMeshSurface2DBaker/master/docs/img/tilemap_navmesh.png)
 
+Prerequisites
+---
+* [Unity NavMeshComponents](https://github.com/Unity-Technologies/NavMeshComponents)
+
 Usage
 ---
 1. Put Surface2DBaker script on same GameObject as your NavMeshSurface.
