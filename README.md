@@ -22,6 +22,12 @@ FAQ
 * CompositeCollider2D
 * TilemapCollider2D (For those to work, you have to make them part of a CompositeCollider2D, though!)
 
+### Baking takes a really long time, even for a small map, why is that?
+Your NavMeshAgent radius is probably way too small. Experiment with the radius until you find a radius that's as big as possible while still giving you accurate results.
+
+### The resulting mesh is very inaccurate, why is that?
+Your NavMeshAgent radius is probably too big. Experiment with the radius until you find a radius that's as big as possible while still giving you accurate results.
+
 ### Why didn't you implement a new NavMeshSurface script? Why do we have to use 2 components?
 While the NavMeshSurface script and its editor counterpart are open source, they contain a lot of code and they have been changed many times in the past. If I modified this code, I would have to update my project every time Unity changes any of those components.
 By writing my own component and only using public methods of the NavMeshComponents project, I hope to keep a high level of compatibility with future versions and the need for changes on my side to a minimum.
