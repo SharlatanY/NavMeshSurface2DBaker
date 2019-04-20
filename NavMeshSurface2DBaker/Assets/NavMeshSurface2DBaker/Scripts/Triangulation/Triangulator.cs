@@ -29,7 +29,7 @@ namespace NavMeshSurface2DBaker
     }
 
     /// <summary>
-    /// Triangulates a convex polygon. Produces invalid results with concave polygons but is faster when using on convex polygons.
+    /// Triangulates a convex polygon. Produces invalid results with concave polygons but is faster when used with convex polygons.
     /// </summary>
     /// <param name="vertices">Vertex locations making up the polygon.</param>
     /// <returns></returns>
@@ -45,7 +45,7 @@ namespace NavMeshSurface2DBaker
     /// The points on the polygon should be ordered counter-clockwise.
     /// This algorithm is called ear clipping and it's O(n*n) Another common algorithm is dividing it into trapezoids and it's O(n log n).
     /// </summary>
-    /// <param name="vertices"></param>
+    /// <param name="vertices">Ordered list of vertices making up the polygon. Can be oriented CW as well as CCW.</param>
     /// <returns></returns>
     /// <exception cref="ArgumentException">If fewer than 3 vertices are provided.</exception>
     public static List<Triangle> TriangulateConcaveOrConvexPolygon(List<Vertex> vertices)
@@ -53,6 +53,12 @@ namespace NavMeshSurface2DBaker
       if (vertices.Count < 3)
       {
         throw new ArgumentException($"A polygon needs at least 3 vertices. Vertices provided: {vertices.Count}");
+      }
+
+      //Rest of functions needs orientation to be ccw. Change orientation if it's cw
+      if (GeometryHelper.PolygonOrientedClockwise(vertices))
+      {
+        vertices.Reverse();
       }
 
       var triangles = new List<Triangle>();

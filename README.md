@@ -39,7 +39,7 @@ By writing my own component and only using public methods of the NavMeshComponen
 Compatibility
 ---
 Current version tested with:
-* Unity 2018.3.0f2
+* Unity 2019.1.0f2
 * Unity NavMeshComponents 2018.3.0f2
 
 3rd party components provided with project

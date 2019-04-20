@@ -24,7 +24,7 @@ namespace NavMeshSurface2DBaker
     /// <summary>
     /// Creates a mesh from the points defining a polygon.
     /// </summary>
-    /// <param name="polygonPoints">Points defining the polygon, need to be ordered ccw.</param>
+    /// <param name="polygonPoints">Points defining the polygon, need to be ordered but can be ordered cw or ccw.</param>
     /// <param name="positionOfColliderPointsBelongTo">World position of polygon collider the points belong to. Points need to be from polygon in x/y space!</param>
     /// <param name="parentToAttachTemporaryObjectsTo">Parent to attach the created mesh to.</param>
     /// <returns></returns>

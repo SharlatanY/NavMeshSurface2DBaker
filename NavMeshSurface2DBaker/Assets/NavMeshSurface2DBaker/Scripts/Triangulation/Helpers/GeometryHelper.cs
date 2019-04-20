@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace NavMeshSurface2DBaker
 {
@@ -60,6 +62,47 @@ namespace NavMeshSurface2DBaker
       }
 
       return insideTriangle;
+    }
+
+    /// <summary>
+    /// Determines if a non complex polygon is oriented clockwise (CW) or counter-clockwise (CCW).
+    /// Works for convex as well as concave polygons.
+    /// </summary>
+    /// <param name="vertices">Ordered vertices defining th polygon</param>
+    /// <returns>Polygon oriented CW (true) or CCW (false)</returns>
+    /// /// <exception cref="ArgumentException">If fewer than 3 vertices are provided.</exception>
+    public static bool PolygonOrientedClockwise(List<Vertex> vertices)
+    {
+      if (vertices.Count < 3)
+      {
+        throw new ArgumentException($"A polygon needs at least 3 vertices. Vertices provided: {vertices.Count}");
+      }
+
+      //https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+
+      var sum = 0f;
+      var vertexCount = vertices.Count; //only get count once
+      for (var i = 0; i < vertexCount; i++)
+      {
+        var indexOfNextVertex = CollectionsHelper.WrapIndex(i + 1, vertexCount);
+
+        var x1 = vertices[i].Position.x;
+        var y1 = vertices[i].Position.y;
+        var x2 = vertices[indexOfNextVertex].Position.x;
+        var y2 = vertices[indexOfNextVertex].Position.y;
+
+        sum += (x2 - x1) * (y2 + y1);
+      }
+
+      // sum > 0 -> clockwise
+      // sum = 0 -> Positive and negative areas cancel out, as in a figure-eight, probably not intended if that ever happens. No idea if this would still work; log warning
+      // sum < 0 -> counter-clockwise
+      if (Math.Abs(sum) < 0.000010f)
+      {
+        Debug.LogWarning("Sum of all positive and negative areas of polygon cancel out, something's probably wrong with your polygon.");
+      }
+
+      return sum > 0;
     }
   }
 }
