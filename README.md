@@ -45,3 +45,7 @@ Current version tested with:
 3rd party components provided with project
 ---
 * [Unity NavMeshComponents](https://github.com/Unity-Technologies/NavMeshComponents) (MIT license, for full license details see subfolder *NavMeshComponents*)
+
+Major Updates
+---
+* April 20, 2019: Added support for clockwise oriented polygons
