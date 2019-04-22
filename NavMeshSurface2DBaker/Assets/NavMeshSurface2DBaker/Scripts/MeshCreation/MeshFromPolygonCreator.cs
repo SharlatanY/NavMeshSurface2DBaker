@@ -18,32 +18,41 @@ namespace NavMeshSurface2DBaker
     [Obsolete("Old debug function")]
     public static void CreateMeshFromPolygonCollider2D(PolygonCollider2D collider, Transform parentToAttachTemporaryObjectsTo)
     {
-      CreateMesh(collider.points, collider.transform.position, parentToAttachTemporaryObjectsTo);
+      CreateMesh(collider.points, collider.transform, parentToAttachTemporaryObjectsTo);
     }
 
     /// <summary>
     /// Creates a mesh from the points defining a polygon.
     /// </summary>
     /// <param name="polygonPoints">Points defining the polygon, need to be ordered but can be ordered cw or ccw.</param>
-    /// <param name="positionOfColliderPointsBelongTo">World position of polygon collider the points belong to. Points need to be from polygon in x/y space!</param>
+    /// <param name="transformPolygonColliderBelongsTo">Transform of polygon collider the points belong to. Points need to be from polygon in x/y space!</param>
     /// <param name="parentToAttachTemporaryObjectsTo">Parent to attach the created mesh to.</param>
     /// <returns></returns>
-    public static GameObject CreateMesh(Vector2[] polygonPoints, Vector3 positionOfColliderPointsBelongTo, Transform parentToAttachTemporaryObjectsTo)
+    public static GameObject CreateMesh(Vector2[] polygonPoints, Transform transformPolygonColliderBelongsTo, Transform parentToAttachTemporaryObjectsTo)
     {
+      var polygonTransformPosition = transformPolygonColliderBelongsTo.position;
+
       //create mesh
       var mesh = CreateBaseMesh(polygonPoints);
       mesh = CreateExtrudedMeshFromBaseMesh(mesh);
 
       //create gameobject and attach mesh
       var go = new GameObject("Mesh");
-      go.transform.parent = parentToAttachTemporaryObjectsTo;
+      
       //mesh now directly lies on plane PolygonCollider2D was created on and extrudes into positive z direction.
       //Take it back a little so it 100% penetrates plane and we won't have an edge case where it might not get detected by the navmesh builder.
       // ReSharper disable once PossibleLossOfFraction
-      go.transform.position = new Vector3(positionOfColliderPointsBelongTo.x, positionOfColliderPointsBelongTo.y, -MeshDepth);
+      go.transform.position = new Vector3(polygonTransformPosition.x, polygonTransformPosition.y, -MeshDepth);
       var meshFilter = go.AddComponent<MeshFilter>();
       meshFilter.mesh = mesh;
       go.AddComponent<MeshRenderer>();
+
+      //apply rotation and scale of original collider transform
+      go.transform.localScale = transformPolygonColliderBelongsTo.lossyScale;
+      go.transform.rotation = transformPolygonColliderBelongsTo.rotation;
+
+      //attach transform to parent. Doing this at the end because it's e.g. easier to set scale when transform has no parent
+      go.transform.parent = parentToAttachTemporaryObjectsTo;
 
       return go;
     }

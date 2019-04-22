@@ -97,7 +97,7 @@ namespace NavMeshSurface2DBaker
       {
         if (!col.usedByComposite)
         {
-          createdGameObjects.Add(MeshFromPolygonCreator.CreateMesh(col.points, col.transform.position, parentToAttachTemporaryObjectsTo));
+          createdGameObjects.Add(MeshFromPolygonCreator.CreateMesh(col.points, col.transform, parentToAttachTemporaryObjectsTo));
         }
       }
 
@@ -122,7 +122,7 @@ namespace NavMeshSurface2DBaker
         {
           var pathNodes = new Vector2[col.GetPathPointCount(i)];
           col.GetPath(i, pathNodes);
-          createdGameObjects.Add(MeshFromPolygonCreator.CreateMesh(pathNodes, col.transform.position, parentToAttachTemporaryObjectsTo));
+          createdGameObjects.Add(MeshFromPolygonCreator.CreateMesh(pathNodes, col.transform, parentToAttachTemporaryObjectsTo));
         }
       }
 
@@ -143,13 +143,21 @@ namespace NavMeshSurface2DBaker
 
       foreach (var col in circleColliders)
       {
+        var colliderTransform = col.transform;
+        var colliderPosition = colliderTransform.position;
+        var lossyColliderScale = colliderTransform.lossyScale;
+        var colliderOffset = col.offset;
+
         var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         var diameter = col.radius * 2;
         var capsuleCollider = cylinder.GetComponent<CapsuleCollider>();
         capsuleCollider.enabled = false; //disable just in case there are any other 3d colliders around that could be affected by this
-        cylinder.transform.localScale = new Vector3(diameter, cylinder.transform.localScale.y, diameter);
-        cylinder.transform.position = new Vector3(col.transform.position.x, col.transform.position.y, -capsuleCollider.height / 2);
+        
+        var scalingMultiplier = Mathf.Max(lossyColliderScale.x, lossyColliderScale.y);
+        cylinder.transform.localScale = Vector3.Scale(new Vector3(diameter, 1, diameter), new Vector3(scalingMultiplier, 1, scalingMultiplier));
+        cylinder.transform.position = new Vector3(colliderPosition.x + colliderOffset.x * scalingMultiplier, colliderPosition.y + colliderOffset.y * scalingMultiplier, -capsuleCollider.height / 2);
         cylinder.transform.rotation = Quaternion.Euler(90, 0, 0);
+
         cylinder.transform.parent = parentToAttachTemporaryObjectsTo;
 
         createdGameObjects.Add(cylinder);
@@ -175,11 +183,18 @@ namespace NavMeshSurface2DBaker
       {
         if (!col.usedByComposite)
         {
+          var colliderSize = col.size;
+          var colliderTransform = col.transform;
+          var colliderBoundsCenter = col.bounds.center;
+          var lossyColliderScale = colliderTransform.lossyScale;
+
           var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
           var cubeCollider = cube.GetComponent<BoxCollider>();
           cubeCollider.enabled = false; //disable just in case there are any other 3d colliders around that could be affected by this
-          cube.transform.localScale = new Vector3(col.size.x, col.size.y, cube.transform.localScale.z);
-          cube.transform.position = new Vector3(col.transform.position.x + col.offset.x, col.transform.position.y + col.offset.y, -cube.transform.localScale.z / 2);
+          cube.transform.localScale = Vector3.Scale(new Vector3(colliderSize.x, colliderSize.y, 1), new Vector3(lossyColliderScale.x, lossyColliderScale.y, 1));
+          cube.transform.rotation = colliderTransform.rotation;
+          cube.transform.position = new Vector3(colliderBoundsCenter.x, colliderBoundsCenter.y, -cube.transform.localScale.z / 2);
+
           cube.transform.parent = parentToAttachTemporaryObjectsTo;
 
           createdGameObjects.Add(cube);
