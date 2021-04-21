@@ -152,10 +152,11 @@ namespace NavMeshSurface2DBaker
         var diameter = col.radius * 2;
         var capsuleCollider = cylinder.GetComponent<CapsuleCollider>();
         capsuleCollider.enabled = false; //disable just in case there are any other 3d colliders around that could be affected by this
+		NavigationHelper.Clone_Modifier(cylinder, col.gameObject);
         
         var scalingMultiplier = Mathf.Max(lossyColliderScale.x, lossyColliderScale.y);
         cylinder.transform.localScale = Vector3.Scale(new Vector3(diameter, 1, diameter), new Vector3(scalingMultiplier, 1, scalingMultiplier));
-        cylinder.transform.position = new Vector3(colliderPosition.x + colliderOffset.x * scalingMultiplier, colliderPosition.y + colliderOffset.y * scalingMultiplier, -capsuleCollider.height / 2);
+        cylinder.transform.position = new Vector3(colliderPosition.x + colliderOffset.x * scalingMultiplier, colliderPosition.y + colliderOffset.y * scalingMultiplier, (NavigationHelper.IsNotWalkable(cylinder) ? -1 : 1) * capsuleCollider.height / 2); // Put ontop if obstacle, below ground if modifier
         cylinder.transform.rotation = Quaternion.Euler(90, 0, 0);
 
         cylinder.transform.parent = parentToAttachTemporaryObjectsTo;
@@ -191,9 +192,10 @@ namespace NavMeshSurface2DBaker
           var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
           var cubeCollider = cube.GetComponent<BoxCollider>();
           cubeCollider.enabled = false; //disable just in case there are any other 3d colliders around that could be affected by this
+          NavigationHelper.Clone_Modifier(cube, col.gameObject);
           cube.transform.localScale = Vector3.Scale(new Vector3(colliderSize.x, colliderSize.y, 1), new Vector3(lossyColliderScale.x, lossyColliderScale.y, 1));
           cube.transform.rotation = colliderTransform.rotation;
-          cube.transform.position = new Vector3(colliderBoundsCenter.x, colliderBoundsCenter.y, -cube.transform.localScale.z / 2);
+          cube.transform.position = new Vector3(colliderBoundsCenter.x, colliderBoundsCenter.y, (NavigationHelper.IsNotWalkable(cube) ? -1 : 1) * cube.transform.localScale.z / 2); // Put ontop if obstacle, below ground if modifier
 
           cube.transform.parent = parentToAttachTemporaryObjectsTo;
 

@@ -38,11 +38,12 @@ namespace NavMeshSurface2DBaker
 
       //create gameobject and attach mesh
       var go = new GameObject("Mesh");
+      NavigationHelper.Clone_Modifier(go, transformPolygonColliderBelongsTo.gameObject);
       
       //mesh now directly lies on plane PolygonCollider2D was created on and extrudes into positive z direction.
       //Take it back a little so it 100% penetrates plane and we won't have an edge case where it might not get detected by the navmesh builder.
       // ReSharper disable once PossibleLossOfFraction
-      go.transform.position = new Vector3(polygonTransformPosition.x, polygonTransformPosition.y, -MeshDepth);
+      go.transform.position = new Vector3(polygonTransformPosition.x, polygonTransformPosition.y, NavigationHelper.IsNotWalkable(go) ? -MeshDepth : 0); // Put ontop if obstacle, below ground if modifier
       var meshFilter = go.AddComponent<MeshFilter>();
       meshFilter.mesh = mesh;
       go.AddComponent<MeshRenderer>();
